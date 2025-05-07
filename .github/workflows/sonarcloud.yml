@@ -3,10 +3,10 @@ name: SonarCloud Analysis
 on:
   push:
     branches:
-      - azure-pipelines
+      - main
   pull_request:
     branches:
-      - azure-pipelines
+      - main
 
 jobs:
   sonarcloud:
