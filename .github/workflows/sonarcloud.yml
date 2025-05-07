@@ -1,19 +1,45 @@
-name: Build
+name: SonarCloud Analysis
+
 on:
   push:
     branches:
-      - main
+      - azure-pipelines
   pull_request:
-    types: [opened, synchronize, reopened]
+    branches:
+      - azure-pipelines
+
 jobs:
-  sonarqube:
-    name: SonarQube
+  sonarcloud:
+    name: 🔍 SonarCloud Analysis
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: read       # for actions/checkout
+      security-events: write  # to upload SARIF file to GitHub code scanning
+
     steps:
-      - uses: actions/checkout@v4
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v3
         with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-      - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@v5
+          fetch-depth: 0  # Ensures full Git history for accurate analysis
+
+      # Optional: Set up Java (remove if not a Java project)
+      # - name: ☕ Set up JDK 17
+      #   uses: actions/setup-java@v3
+      #   with:
+      #     java-version: '17'
+      #     distribution: 'temurin'
+
+      - name: 🛠️ Run SonarCloud Scan with SARIF output
+        uses: SonarSource/sonarcloud-github-action@master
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}   # 🔑 For PR decoration
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}     # 🔐 SonarCloud token
+        with:
+          args: >
+            -Dsonar.sarifReportPath=sonar-report.sarif
+
+      - name: 📤 Upload SARIF to GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: sonar-report.sarif
