@@ -8,6 +8,10 @@ COPY . .
 
 ENV NODE_ENV=production
 
+ENV AWS_ACCESS= 'AKIA4MTWI4VXGZHLGUE61'
+          
+ENV AWS_SECRET= 'jbToBJzML4imOAZjXn0ZP2F/XdibfprKa4Fqt6kq2'
+
 RUN npm install --omit=dev
 
 RUN npm run build
